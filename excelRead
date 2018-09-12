@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.OleDb;
+using System.Data;
+
+namespace ConsoleApp1
+{
+
+    class Program
+    {
+            static void Main(string[] args)
+        {
+            OleDbConnection xlsxbaglanti = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\exhibitA-input.xlsx; Extended Properties='Excel 12.0 Xml;HDR=YES'");
+            xlsxbaglanti.Open();
+            OleDbCommand komut = new OleDbCommand();
+            komut.Connection = xlsxbaglanti;
+            string sql = "SELECT COUNT(CLIENT_ID) AS CLIENT_COUNT, DISTINCT_PLAY_COUNT FROM( SELECT COUNT(SONG_ID) AS DISTINCT_PLAY_COUNT, CLIENT_ID FROM(SELECT CLIENT_ID, SONG_ID FROM [YeniSayfa$] WHERE PLAY_TS = '10.08.2016' GROUP BY SONG_ID) GROUP BY CLIENT_ID) GROUP BY DISTINCT_PLAY_COUNT";
+            komut.CommandText = sql;
+            komut.ExecuteNonQuery();
+
+            OleDbDataReader oku = komut.ExecuteReader();
+            
+             while (oku.Read())
+             {
+                string client_count = oku["CLIENT_COUNT"].ToString();
+                string distinc_play_count=oku["DISTINCT_PLAY_COUNT"].ToString();
+                 Console.WriteLine("client count:"+ client_count + "distinct play count :" + distinc_play_count+ Environment.NewLine);
+            }
+            xlsxbaglanti.Close();
+            Console.ReadLine();
+        }
+    }
+}
